@@ -1,10 +1,10 @@
 <template>
   <form @submit.prevent="submitForm">
-    <div class="formo-control">
+    <div class="form-control">
       <label for="email">Your E-Mail</label>
       <input type="email" id="email" v-model.trim="email" />
     </div>
-    <div class="formo-control">
+    <div class="form-control">
       <label for="message">Message</label>
       <textarea id="message" rows="5" v-model.trim="message"></textarea>
     </div>
@@ -91,7 +91,6 @@ textarea:focus {
 }
 
 .actions {
-  margin-top: 10px;
   text-align: center;
 }
 </style>
