@@ -1,13 +1,12 @@
 export default {
   async contactCoach(context, payload) {
-    let newRequest = {
-      coachId: payload.coachId,
+    const newRequest = {
       userEmail: payload.email,
       message: payload.message,
     };
 
     const response = await fetch(
-      'https://vue-http-demo-389f4-default-rtdb.firebaseio.com/requests.json',
+      `https://vue-http-demo-389f4-default-rtdb.firebaseio.com/requests/${payload.coachId}.json`,
       {
         method: 'POST',
         body: JSON.stringify(newRequest),
@@ -17,38 +16,40 @@ export default {
     const responseData = await response.json();
 
     if (!response.ok) {
-      // error
-      const error = new Error(responseData.message || 'Something went wrong!');
+      const error = new Error(
+        responseData.message || 'Failed to send request.'
+      );
       throw error;
     }
 
-    newRequest = {
-      id: responseData.name,
-      ...newRequest,
-    };
-
-    console.log('newRequest: ', newRequest);
+    newRequest.id = responseData.name;
+    newRequest.coachId = payload.coachId;
 
     context.commit('addRequest', newRequest);
   },
-  async loadRequests(context) {
+  async fetchRequests(context) {
+    const coachId = context.rootGetters.userId;
     const response = await fetch(
-      'https://vue-http-demo-389f4-default-rtdb.firebaseio.com/requests.json'
+      `https://vue-http-demo-389f4-default-rtdb.firebaseio.com/requests/${coachId}.json`
     );
 
     const responseData = await response.json();
 
     if (!response.ok) {
-      const error = new Error(responseData.message || 'Something went wrong!');
+      const error = new Error(
+        responseData.message || 'Failed to fetch requests.'
+      );
       throw error;
     }
 
     const requests = [];
 
-    for (let data in responseData) {
-      let request = {
-        id: data,
-        ...responseData[data],
+    for (let key in responseData) {
+      const request = {
+        id: key,
+        coachId: coachId,
+        userEmail: responseData[key].userEmail,
+        message: responseData[key].message,
       };
       requests.push(request);
     }
